@@ -23,7 +23,7 @@ public class ChatHub : Hub
         return Clients.Caller.SendAsync("ReceiveAllSdpJsons", _sdpStore.Get());
     }
 
-    public Task ReceiveLocalAnswer(string sdpAnswerJson)
+    public Task ReturnAnswer(string sdpAnswerJson)
     {
         return Clients.Others.SendAsync("ReceiveSdpAnswerJson", sdpAnswerJson);
     }

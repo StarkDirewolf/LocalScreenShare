@@ -37,13 +37,13 @@ namespace LocalScreenShare.Client.Pages
             hubConnectionProxy.On<string>("ReceiveAllSdpJsons", async sdps =>
             {
                 if (!string.IsNullOrEmpty(sdps))
-                    await module.InvokeVoidAsync("connectRemoteSdp", sdps);
+                    await module.InvokeVoidAsync("receiveSignal", sdps);
             });
 
             hubConnectionProxy.On<string>("ReceiveSdpAnswerJson", async sdp =>
             {
                 if (!string.IsNullOrEmpty(sdp))
-                    await module.InvokeVoidAsync("receiveAnswer", sdp);
+                    await module.InvokeVoidAsync("receiveSignal", sdp);
             });
 
             await hubConnectionProxy.StartAsync();
@@ -74,9 +74,9 @@ namespace LocalScreenShare.Client.Pages
         }
 
         [JSInvokable]
-        public static Task ReceiveLocalSdpAnswerAsync(string sdpAnswerJson)
+        public static async Task ReceiveLocalSdpAnswerAsync(string sdpAnswerJson)
         {
-            return hubConnectionProxy?.SendAsync("ReturnAnswer", sdpAnswerJson)!;
+            await hubConnectionProxy?.SendAsync("ReturnAnswer", sdpAnswerJson)!;
         }
 
         //[JSInvokable]

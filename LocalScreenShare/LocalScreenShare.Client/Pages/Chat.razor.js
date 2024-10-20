@@ -2,6 +2,7 @@
 
 let pc;
 let localStream;
+let receiveStream;
 
 const displayMediaOptions = {
     video: {
@@ -21,16 +22,50 @@ const displayMediaOptions = {
 };
 
 const signaling = new BroadcastChannel('webrtc');
-signaling.onmessage = e => {
-    switch (e.data.type) {
+//signaling.onmessage = e => {
+//    switch (e.data.type) {
+//        case 'offer':
+//            handleOffer(e.data);
+//            break;
+//        case 'answer':
+//            handleAnswer(e.data);
+//            break;
+//        case 'candidate':
+//            handleCandidate(e.data);
+//            break;
+//        case 'ready':
+//            // A second tab joined. This tab will initiate a call unless in a call already.
+//            if (pc) {
+//                console.log('already in call, ignoring');
+//                return;
+//            }
+//            makeCall();
+//            break;
+//        case 'bye':
+//            if (pc) {
+//                hangup();
+//            }
+//            break;
+//        default:
+//            console.log('unhandled', e);
+//            break;
+//    }
+//};
+
+videoElem.onerror = () => {
+    console.log(`Error ${videoElem.error.code}; details: ${videoElem.error.message}`)
+}
+
+function processSignal(signal) {
+    switch (signal.type) {
         case 'offer':
-            handleOffer(e.data);
+            handleOffer(signal);
             break;
         case 'answer':
-            handleAnswer(e.data);
+            handleAnswer(signal);
             break;
         case 'candidate':
-            handleCandidate(e.data);
+            handleCandidate(signal);
             break;
         case 'ready':
             // A second tab joined. This tab will initiate a call unless in a call already.
@@ -49,18 +84,10 @@ signaling.onmessage = e => {
             console.log('unhandled', e);
             break;
     }
-};
-
-videoElem.onerror = () => {
-    console.log(`Error ${videoElem.error.code}; details: ${videoElem.error.message}`)
 }
 
 async function createPeerConnection() {
     pc = new RTCPeerConnection();
-
-    if (localStream != null) {
-        pc.addStream(localStream);
-    }
 
     pc.onicecandidate = e => {
         const message = {
@@ -72,7 +99,7 @@ async function createPeerConnection() {
             message.sdpMid = e.candidate.sdpMid;
             message.sdpMLineIndex = e.candidate.sdpMLineIndex;
         }
-        signaling.postMessage(message);
+        processSignal(message);
     };
     //pc.ontrack = e => videoElem.srcObject = e.streams[0];
 }
@@ -81,22 +108,26 @@ async function makeCall() {
     await createPeerConnection();
 
     const offer = await pc.createOffer();
-    signaling.postMessage(offer);
+    processSignal(offer);
     await pc.setLocalDescription(offer);
     DotNet.invokeMethodAsync('LocalScreenShare.Client', 'ReceiveLocalSdp', offer);
 }
 
-async function handleOffer(offer) {
+async function handleOffer(signal) {
     if (pc) {
         console.error('existing peerconnection');
         return;
     }
     await createPeerConnection();
-    await pc.setRemoteDescription(offer);
+    await pc.setRemoteDescription(signal);
 
     const answer = await pc.createAnswer();
     await pc.setLocalDescription(answer);
-    DotNet.invokeMethodAsync('LocalScreenShare.Client', 'ReceiveLocalSdpAnswer', answer);
+
+    pc.ontrack = e => videoElem.srcObject = e.streams[0];
+
+    const answerJson = JSON.stringify(answer);
+    DotNet.invokeMethodAsync('LocalScreenShare.Client', 'ReceiveLocalSdpAnswerAsync', answerJson);
 }
 
 async function handleAnswer(answer) {
@@ -119,20 +150,22 @@ async function handleCandidate(candidate) {
     }
 }
 
-export async function receiveAnswer(sdpAnswerJson) {
-    var sdp = JSON.parse(sdpAnswerJson);
-    signaling.postMessage(sdp);
-}
-
-export async function connectRemoteSdp(sdpJson) {
-    var sdp = JSON.parse(sdpJson);
-    signaling.postMessage(sdp)
+export async function receiveSignal(signalJson) {
+    var signal = JSON.parse(signalJson);
+    processSignal(signal);
 }
 
 export async function captureScreen() {
     localStream = await navigator.mediaDevices.getDisplayMedia(displayMediaOptions);
-
+    videoElem.srcObject = localStream;
     await createPeerConnection();
+
+    localStream.onaddtrack = e => {
+        console.log("track");
+        pc.addTrack(e.track);
+    }
+
+    console.log(localStream);
 
     const offer = await pc.createOffer();
     await pc.setLocalDescription(offer);
