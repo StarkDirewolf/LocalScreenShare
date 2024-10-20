@@ -1,0 +1,8 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\LocalScreenShare.Client\LocalScreenShare.Client.csproj" />
+    <ProjectReference Include="..\..\LocalScreenShare\LocalScreenShare.csproj" />
+  </ItemGroup>
+
+</Project>
