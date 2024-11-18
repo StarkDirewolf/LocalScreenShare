@@ -12,7 +12,7 @@ using System.Runtime.Intrinsics.Arm;
 
 namespace LocalScreenShare.Client.Pages
 {
-    public partial class Chat
+    public partial class Stream
     {
         internal static IJSObjectReference module = null!;
 
@@ -46,6 +46,12 @@ namespace LocalScreenShare.Client.Pages
                     await module.InvokeVoidAsync("receiveSignal", sdp);
             });
 
+            hubConnectionProxy.On<string>("ReceiveCandidateJson", async candidate =>
+            {
+                if (!string.IsNullOrEmpty(candidate))
+                    await module.InvokeVoidAsync("receiveSignal", candidate);
+            });
+
             await hubConnectionProxy.StartAsync();
         }
 
@@ -64,6 +70,7 @@ namespace LocalScreenShare.Client.Pages
                 "./Pages/Chat.razor.js");
 
                 hubConnectionProxy?.SendAsync("GetSdps");
+                hubConnectionProxy?.SendAsync("GetHostCandidate");
             }
         }
 
@@ -77,6 +84,18 @@ namespace LocalScreenShare.Client.Pages
         public static async Task ReceiveLocalSdpAnswerAsync(string sdpAnswerJson)
         {
             await hubConnectionProxy?.SendAsync("ReturnAnswer", sdpAnswerJson)!;
+        }
+
+        [JSInvokable]
+        public static async Task ReceiveHostCandidateAsync(string candidateJson)
+        {
+            await hubConnectionProxy?.SendAsync("StoreHostCandidate", candidateJson)!;
+        }
+
+        [JSInvokable]
+        public static async Task ReceiveClientCandidateAsync(string candidateJson)
+        {
+            await hubConnectionProxy?.SendAsync("ReturnClientCandidate", candidateJson)!;
         }
 
         //[JSInvokable]
