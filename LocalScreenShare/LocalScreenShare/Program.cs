@@ -1,8 +1,7 @@
-using LocalScreenShare.Client.Pages;
 using LocalScreenShare.Components;
-using Microsoft.AspNetCore.ResponseCompression;
 using LocalScreenShare.Hubs;
 using LocalScreenShare.Services;
+using Microsoft.AspNetCore.ResponseCompression;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,6 +48,6 @@ app.MapRazorComponents<App>()
     .AddInteractiveWebAssemblyRenderMode()
     .AddAdditionalAssemblies(typeof(LocalScreenShare.Client._Imports).Assembly);
 
-app.MapHub<ChatHub>("/chathub");
+app.MapHub<SignalHub>("/signalhub");
 
 app.Run();

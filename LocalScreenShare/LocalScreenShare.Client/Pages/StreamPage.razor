@@ -1,0 +1,14 @@
+﻿@page "/stream"
+@rendermode InteractiveWebAssembly
+@using Microsoft.AspNetCore.SignalR.Client
+@inject NavigationManager Navigation
+@implements IAsyncDisposable
+
+<PageTitle>Stream</PageTitle>
+
+<button @onclick="Start" disabled="@(!IsConnected)">Start</button>
+
+<hr>
+
+<video id="video" height="1024" width="2048" autoplay />
+

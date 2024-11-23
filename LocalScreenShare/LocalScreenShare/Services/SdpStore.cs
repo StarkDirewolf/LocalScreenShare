@@ -1,5 +1,6 @@
 namespace LocalScreenShare.Services;
 
+/// <inheritdoc cref="ISdpStore"/>
 public class SdpStore : ISdpStore
 {
     private string _sdp;

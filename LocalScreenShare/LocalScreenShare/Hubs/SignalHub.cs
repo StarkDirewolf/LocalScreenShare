@@ -1,14 +1,17 @@
-﻿using LocalScreenShare.Services;
+﻿using LocalScreenShare.Client.Constants;
+using LocalScreenShare.Services;
 using Microsoft.AspNetCore.SignalR;
-using System.Drawing;
 
 namespace LocalScreenShare.Hubs;
 
-public class ChatHub : Hub
+/// <summary>
+/// A SignalR hub for handling WebRTC connections as a signaling server.
+/// </summary>
+public class SignalHub : Hub
 {
     private ISdpStore _sdpStore;
 
-    public ChatHub(ISdpStore sdpStore)
+    public SignalHub(ISdpStore sdpStore)
     {
         _sdpStore = sdpStore;
     }
@@ -24,7 +27,7 @@ public class ChatHub : Hub
 
         if (sdps != null && sdps.Length > 0)
         {
-            return Clients.Caller.SendAsync("ReceiveAllSdpJsons", _sdpStore.Get());
+            return Clients.Caller.SendAsync(CSMethod.StreamPage.ReceiveSignal, _sdpStore.Get());
         }
 
         return Task.CompletedTask;
@@ -37,24 +40,23 @@ public class ChatHub : Hub
     public void StoreClientCandidate(string candidate)
     {
         _sdpStore.AddClientCandidate(candidate);
-        // Some kind of error going on
     }
 
     public Task GetHostCandidate()
     {
         var hostCandidate = _sdpStore.GetHostCandidate();
         if (hostCandidate != null)
-            return Clients.Caller.SendAsync("ReceiveCandidateJson", _sdpStore.GetHostCandidate());
+            return Clients.Caller.SendAsync(CSMethod.StreamPage.ReceiveSignal, _sdpStore.GetHostCandidate());
         else return Task.CompletedTask;
     }
 
     public Task ReturnClientCandidate(string candidate)
     {
-        return Clients.Others.SendAsync("ReceiveCandidateJson", candidate);
+        return Clients.Others.SendAsync(CSMethod.StreamPage.ReceiveSignal, candidate);
     }
 
     public Task ReturnAnswer(string sdpAnswerJson)
     {
-        return Clients.Others.SendAsync("ReceiveSdpAnswerJson", sdpAnswerJson);
+        return Clients.Others.SendAsync(CSMethod.StreamPage.ReceiveSignal, sdpAnswerJson);
     }
 }

@@ -1,7 +1,6 @@
-﻿using LocalScreenShare.Hubs;
+﻿using Microsoft.AspNetCore.SignalR;
 using NSubstitute;
 using Xunit;
-using Microsoft.AspNetCore.SignalR;
 
 namespace LocalScreenShare.Test.Unit;
 

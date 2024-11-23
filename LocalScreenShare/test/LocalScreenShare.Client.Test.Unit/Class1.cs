@@ -1,12 +1,10 @@
-﻿using NSubstitute;
-using Xunit;
-using Microsoft.AspNetCore.SignalR;
-using LocalScreenShare.Client.Pages;
-using LocalScreenShare.Client.Proxy;
+﻿using Bunit;
 using FluentAssertions;
-using Microsoft.JSInterop;
 using LocalScreenShare.Client.Constants;
-using Bunit;
+using LocalScreenShare.Client.Proxy;
+using Microsoft.JSInterop;
+using NSubstitute;
+using Xunit;
 
 namespace LocalScreenShare.Client.Test.Unit;
 
