@@ -1,12 +1,4 @@
-﻿using Bunit;
-using FluentAssertions;
-using LocalScreenShare.Client.Constants;
-using LocalScreenShare.Client.Proxy;
-using Microsoft.JSInterop;
-using NSubstitute;
-using Xunit;
-
-namespace LocalScreenShare.Client.Test.Unit;
+﻿namespace LocalScreenShare.Client.Test.Unit;
 
 public class Class1 : TestContext
 {
@@ -26,7 +18,7 @@ public class Class1 : TestContext
     }
 
     [Fact]
-    public async Task test()
+    public async Task Test()
     {
         var method = _chatComponent.Send;
         await method.Should().NotThrowAsync();

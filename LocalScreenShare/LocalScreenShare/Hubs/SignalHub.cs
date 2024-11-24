@@ -7,56 +7,38 @@ namespace LocalScreenShare.Hubs;
 /// <summary>
 /// A SignalR hub for handling WebRTC connections as a signaling server.
 /// </summary>
-public class SignalHub : Hub
+public class SignalHub(ISdpStore _sdpStore) : Hub
 {
-    private ISdpStore _sdpStore;
+	public void StoreSdpJson(string sdpJson)
+		=> _sdpStore.Add(sdpJson);
 
-    public SignalHub(ISdpStore sdpStore)
-    {
-        _sdpStore = sdpStore;
-    }
+	public Task GetSdps()
+	{
+		var sdps = _sdpStore.Get();
 
-    public void StoreSdpJson(string sdpJson)
-    {
-        _sdpStore.Add(sdpJson);
-    }
+		return sdps != null && sdps.Length > 0
+			? Clients.Caller.SendAsync(CSMethod.StreamPage.ReceiveSignal, sdps)
+			: Task.CompletedTask;
+	}
 
-    public Task GetSdps()
-    {
-        var sdps = _sdpStore.Get();
+	public void StoreHostCandidate(string candidate)
+		=> _sdpStore.AddHostCandidate(candidate);
 
-        if (sdps != null && sdps.Length > 0)
-        {
-            return Clients.Caller.SendAsync(CSMethod.StreamPage.ReceiveSignal, _sdpStore.Get());
-        }
+	public void StoreClientCandidate(string candidate)
+		=> _sdpStore.AddClientCandidate(candidate);
 
-        return Task.CompletedTask;
-    }
+	public Task GetHostCandidate()
+	{
+		var hostCandidate = _sdpStore.GetHostCandidate();
 
-    public void StoreHostCandidate(string candidate)
-    {
-        _sdpStore.AddHostCandidate(candidate);
-    }
-    public void StoreClientCandidate(string candidate)
-    {
-        _sdpStore.AddClientCandidate(candidate);
-    }
+		return hostCandidate != null
+			? Clients.Caller.SendAsync(CSMethod.StreamPage.ReceiveSignal, hostCandidate)
+			: Task.CompletedTask;
+	}
 
-    public Task GetHostCandidate()
-    {
-        var hostCandidate = _sdpStore.GetHostCandidate();
-        if (hostCandidate != null)
-            return Clients.Caller.SendAsync(CSMethod.StreamPage.ReceiveSignal, _sdpStore.GetHostCandidate());
-        else return Task.CompletedTask;
-    }
+	public Task ReturnClientCandidate(string candidate)
+		=> Clients.Others.SendAsync(CSMethod.StreamPage.ReceiveSignal, candidate);
 
-    public Task ReturnClientCandidate(string candidate)
-    {
-        return Clients.Others.SendAsync(CSMethod.StreamPage.ReceiveSignal, candidate);
-    }
-
-    public Task ReturnAnswer(string sdpAnswerJson)
-    {
-        return Clients.Others.SendAsync(CSMethod.StreamPage.ReceiveSignal, sdpAnswerJson);
-    }
+	public Task ReturnAnswer(string sdpAnswerJson)
+		=> Clients.Others.SendAsync(CSMethod.StreamPage.ReceiveSignal, sdpAnswerJson);
 }

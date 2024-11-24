@@ -5,15 +5,15 @@
 /// </summary>
 public interface ISdpStore
 {
-    void Add(string sdp);
+	void Add(string sdp);
 
-    string Get();
+	string? Get();
 
-    void AddHostCandidate(string candidate);
+	void AddHostCandidate(string candidate);
 
-    void AddClientCandidate(string candidate);
+	void AddClientCandidate(string candidate);
 
-    string GetHostCandidate();
+	string? GetHostCandidate();
 
-    string GetClientCandidate();
+	string? GetClientCandidate();
 }

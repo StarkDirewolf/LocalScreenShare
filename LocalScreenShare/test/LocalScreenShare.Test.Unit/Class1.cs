@@ -1,13 +1,9 @@
-﻿using Microsoft.AspNetCore.SignalR;
-using NSubstitute;
-using Xunit;
-
-namespace LocalScreenShare.Test.Unit;
+﻿namespace LocalScreenShare.Test.Unit;
 
 public class Class1
 {
     [Fact]
-    public async Task test()
+    public async Task Test()
     {
         var mockClients = Substitute.For<IHubCallerClients>();
         var mockClient = Substitute.For<ISingleClientProxy>();
