@@ -1,28 +1,38 @@
-﻿namespace LocalScreenShare.Client.Test.Unit;
+﻿using Bunit;
+using FluentAssertions;
+using LocalScreenShare.Client.Constants;
+using LocalScreenShare.Client.Pages;
+using LocalScreenShare.Client.Proxy;
+using Microsoft.JSInterop;
+using NSubstitute;
+using Xunit;
+
+namespace LocalScreenShare.Client.Test.Unit;
 
 public class Class1 : TestContext
 {
-    private IRenderedComponent<Chat> _cut;
-    private Chat _chatComponent;
+	private IRenderedComponent<StreamPage> _cut;
+	private StreamPage _streamComponent;
 
-    public Class1()
-    {
-        JSInterop.SetupModule("./Pages/Chat.razor.js").Setup<IJSStreamReference>(JSMethod.Chat.CaptureScreen);
 
-        _cut = RenderComponent<Chat>();
-        _chatComponent = _cut.Instance;
+	public Class1()
+	{
+		JSInterop.SetupModule(JSMethod.Stream.Filename).Setup<IJSStreamReference>(JSMethod.Stream.CaptureScreen);
 
-        var mockHubConnection = Substitute.For<IHubConnectionProxy>();
+		_cut = RenderComponent<StreamPage>();
+		_streamComponent = _cut.Instance;
 
-        Chat.hubConnectionProxy = mockHubConnection;
-    }
+		var mockHubConnection = Substitute.For<IHubConnectionProxy>();
 
-    [Fact]
-    public async Task Test()
-    {
-        var method = _chatComponent.Send;
-        await method.Should().NotThrowAsync();
+		StreamPage.hubConnectionProxy = mockHubConnection;
+	}
 
-        //await mockHubConnection.Received(1).SendAsync("SendMessage", Arg.Is("TestUser"), Arg.Is("TestMessage"));
-    }
+	[Fact]
+	public async Task Test()
+	{
+		Func<Task> method = StreamPage.Start;
+		await method.Should().NotThrowAsync();
+
+		//await mockHubConnection.Received(1).SendAsync("SendMessage", Arg.Is("TestUser"), Arg.Is("TestMessage"));
+	}
 }

@@ -1,5 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\LocalScreenShare.Client\LocalScreenShare.Client.csproj" />
     <ProjectReference Include="..\..\LocalScreenShare\LocalScreenShare.csproj" />

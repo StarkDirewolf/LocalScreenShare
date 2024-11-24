@@ -1,9 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+  </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="bunit" Version="1.31.3" />
+    <PackageReference Include="bunit" Version="1.36.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\LocalScreenShare.Client\LocalScreenShare.Client.csproj" />
     <ProjectReference Include="..\..\LocalScreenShare\LocalScreenShare.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Update="FluentAssertions" Version="6.12.2" />
+    <PackageReference Update="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+    <PackageReference Update="Microsoft.TestPlatform.TestHost" Version="17.12.0" />
+    <PackageReference Update="NSubstitute" Version="5.3.0" />
+    <PackageReference Update="xunit.core" Version="2.9.2" />
   </ItemGroup>
 </Project>
