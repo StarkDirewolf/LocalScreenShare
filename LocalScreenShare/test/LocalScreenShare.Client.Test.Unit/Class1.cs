@@ -31,7 +31,7 @@ public class Class1 : TestContext
 	public async Task Test()
 	{
 		Func<Task> method = StreamPage.Start;
-		//await method.Should().NotThrowAsync();
+		//await method.Should().NotThrowAsync()
 
 		//await mockHubConnection.Received(1).SendAsync("SendMessage", Arg.Is("TestUser"), Arg.Is("TestMessage"));
 	}
